@@ -8,7 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const appName = document.createElement('h1');
   appName.innerText = 'Weather App';
 
+  const instruction = document.createElement('p');
+  instruction.setAttribute('class', 'instruction')
+  instruction.innerText = 'Enter a location for weather information';
+
   mainContainer.appendChild(appName);
+
+  mainContainer.appendChild(instruction)
 
   // Weather search bar
   const searchBarDiv = document.createElement('div');
@@ -19,8 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
   userInput.className = 'user-input'
 
 
-
-  
   const searchButton = document.createElement('button');
   searchButton.setAttribute('type', 'button');
   searchButton.setAttribute('class', 'search-button')
@@ -42,10 +46,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   mainContainer.appendChild(subWeatherDiv);
 
+  const temperature = document.createElement('div');
+  temperature.setAttribute('class', 'temperature');
 
-  function loadData () {
-    
+  const degree = document.createElement('div');
+  degree.setAttribute('class', 'degree');
+
+  const imgSrc = ``;
+
+  const city = document.createElement('div');
+  city.setAttribute('class', 'city');
+
+  const date = document.createElement('div');
+  date.setAttribute('class', 'date')
+
+  async function loadData () {
+    try {
+      const response = await  fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=f4ba1c5c45874efb70c3f391ae05af62&units=imperial`)
+      //const response = await  fetch(`https://api.openweathermap.org/data/2.5/weather?q=london&appid=f4ba1c5c45874efb70c3f391ae05af62&units=imperial`)
+      const data = await response.json();
+      console.log(data)
+    }
+    catch(error) {
+      return 'There was an error with this request'
+    }
   }
+
+  
   
  
 
