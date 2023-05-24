@@ -14,21 +14,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   mainContainer.appendChild(appName);
 
-  mainContainer.appendChild(instruction)
+  mainContainer.appendChild(instruction);
 
   // Weather search bar
   const searchBarDiv = document.createElement('div');
   searchBarDiv.setAttribute('class', 'search-bar-div')
   const userInput = document.createElement('input');
   userInput.setAttribute('type', 'text');
-  userInput.setAttribute('name', 'userText');
-  userInput.className = 'user-input'
+  userInput.setAttribute('id', 'userInput');
+  
 
 
   const searchButton = document.createElement('button');
   searchButton.setAttribute('type', 'button');
-  searchButton.setAttribute('class', 'search-button')
-  searchButton.innerText = 'Search'
+  searchButton.setAttribute('class', 'search-button');
+  searchButton.innerText = 'Search';
 
   body.appendChild(mainContainer);
   mainContainer.appendChild(searchBarDiv);
@@ -46,37 +46,135 @@ document.addEventListener('DOMContentLoaded', () => {
 
   mainContainer.appendChild(subWeatherDiv);
 
-  const temperature = document.createElement('div');
+  //...
+  const subMainDiv = document.createElement('div');
+  subMainDiv.className = 'subMainDiv'
+
+  const temperature = document.createElement('p');
   temperature.setAttribute('class', 'temperature');
+  
 
-  const degree = document.createElement('div');
+  const degree = document.createElement('p');
   degree.setAttribute('class', 'degree');
+  
 
-  const imgSrc = ``;
+  const icon = document.createElement('img');
+  icon.setAttribute('class', 'icon');
+  
+  
+  const city = document.createElement('p');
+  city.className = 'city'
+  //...
 
-  const city = document.createElement('div');
-  city.setAttribute('class', 'city');
-
-  const date = document.createElement('div');
-  date.setAttribute('class', 'date')
-
-  async function loadData () {
+  async function getApiData (cityName) {
     try {
-      const response = await  fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=f4ba1c5c45874efb70c3f391ae05af62&units=imperial`)
+      const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=f4ba1c5c45874efb70c3f391ae05af62&units=imperial`)
       //const response = await  fetch(`https://api.openweathermap.org/data/2.5/weather?q=london&appid=f4ba1c5c45874efb70c3f391ae05af62&units=imperial`)
       const data = await response.json();
-      console.log(data)
+
+      const temperature = data.weather[0].main;
+
+
+      const degree =  data.main.temp
+
+      const imgSrc = `http://openweathermap.org/img/w/${data.weather[0].icon}.png`;
+
+      const city = data.name;
+
+      const timeZone =  data.timezone;
+      
+
+      return {
+        temperature: temperature,
+        degree: degree,
+        imgSrc: imgSrc,
+        city: city,
+        timeZone: timeZone,
+      }
     }
     catch(error) {
       return 'There was an error with this request'
     }
   }
 
-  
-  
- 
+  async function getWeatherData() {
+    try {
+      const defaultCities = ['new york', 'lagos', 'london'];
+      
+      for (let i = 0; i < defaultCities.length; i++) {
+        const elem = defaultCities[i];
+        const currCity = await getApiData(elem);
 
+        const subDiv = document.createElement('div');
+        subDiv.className = 'subDiv'
 
+        const temperature = document.createElement('p');
+        temperature.setAttribute('class', 'temperature');
+        temperature.innerText = currCity.temperature;
+
+        const degree = document.createElement('p');
+        degree.setAttribute('class', 'degree');
+        degree.innerText = currCity.degree;
+
+        const icon = document.createElement('img');
+        icon.setAttribute('class', 'icon');
+        icon.src = currCity.imgSrc;
+        
+
+        const city = document.createElement('p');
+        city.className = 'city'
+        city.innerText = currCity.city;
+
+        // const timeZone = document.createElement('p');
+        // timeZone.className = 'timeZone'
+        // timeZone.innerText = currCity.timeZone;
+
+        subDiv.appendChild(city);
+        subDiv.appendChild(temperature);
+        subDiv.appendChild(degree);
+        subDiv.appendChild(icon);
+        // subDiv.appendChild(timeZone);
+
+        subWeatherDiv.appendChild(subDiv);
+      
+        
+      }
+    
+      
+    } catch (error) {
+      console.log('There was an error with this request');
+    }
+  }
+  
+  getWeatherData();
+  async function getUserInputWeather (userInput) {
+    try {
+      const currCity = await getApiData(userInput);
+
+      temperature.innerText = currCity.temperature;
+      icon.src = currCity.imgSrc;
+      degree.innerText = currCity.degree;
+      city.innerText = currCity.city;
+
+      subMainDiv.appendChild(city);
+      subMainDiv.appendChild(temperature);
+      subMainDiv.appendChild(degree);
+      subMainDiv.appendChild(icon);
+
+      
+      mainWeatherDiv.appendChild(subMainDiv);
+    }
+    catch(error) {
+      return 'There was an error fulfilling this request'
+    }
+  }
+
+  searchButton.addEventListener('click',async () => {
+    const userInputValue = document.querySelector('#userInput').value;
+    const data = await getUserInputWeather(userInputValue);
+    document.querySelector('#userInput').value = '';
+    
+  })
 
 })
 
